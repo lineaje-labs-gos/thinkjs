@@ -1,7 +1,7 @@
 {
   "name": "thinkjs",
   "description": "ThinkJS - Use full ES6/7 features to develop web applications, Support TypeScript",
-  "version": "2.3.3",
+  "version": "2.3.3-lineaje-01",
   "author": {
     "name": "welefen",
     "email": "welefen@gmail.com"
@@ -41,6 +41,10 @@
     {
       "name": "qgy18",
       "email": "quguangyu@gmail.com"
+    },
+    {
+      "name": "Lineaje DepFixer",
+      "email": "221268890+Lineaje-DepFixer@users.noreply.github.com"
     }
   ],
   "main": "lib/index.js",
@@ -90,7 +94,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/thinkjs/thinkjs"
+    "url": "https://github.com/lineaje-labs-gos/thinkjs"
   },
   "engines": {
     "node": ">=0.12.0"
