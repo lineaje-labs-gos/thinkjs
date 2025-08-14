@@ -50,9 +50,12 @@ jobs:
         run: |
           PROJECT_NAME=${GITHUB_REPOSITORY##*/}
           jf rt u "npm-install.log" "${{ secrets.NPM_STAGING_ARTIFACTORY }}/logs/build_test/${PROJECT_NAME}-${{ github.event.inputs.release_version  }}/" --url https://${{ secrets.JFROG_HOST_NAME }}/artifactory/ --access-token=${{ secrets.JFROG_PASSWORD }}
-         
+
+      - name: Compile package for coverage to run
+        run: npm run compile | tee npm-test.log
+
       - name: Run tests
-        run: npm test 2>&1 | tee npm-test.log
+        run: npm test 2>&1 | tee -a npm-test.log
       
       - name: Upload npm test log to Artifactory
         run: |

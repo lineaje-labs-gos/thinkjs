@@ -39,7 +39,10 @@ jobs:
 
       - name: Install dependencies for Node
         run: npm install
-           
+
+      - name: Compile package for coverage to run
+        run: npm run compile
+
       - name: Run tests
         run: npm test
 
