@@ -289,6 +289,23 @@ export default class extends Base {
    * @return {Promise}       []
    */
   async increment(field, step = 1){
+    if(step===null || step === undefined){
+      step = 1;
+    }
+    step = Number(step);
+    if (typeof field !== 'string' || !field.trim()) {
+      throw new Error('Field name must be a non-empty string');
+    }
+    const forbiddenFields = ['_id'];
+    if (forbiddenFields.includes(field)) {
+      throw new Error('Modifying this field is not allowed.');
+    }
+    if (isNaN(step)) {
+      throw new Error('Invalid step value passed. Must be a number.');
+    }
+    if (!Number.isFinite(step)){
+      throw new Error('Step must be a finite number.');
+    } 
     let options = await this.parseOptions();
     return this.db().update({
       $inc: {
@@ -305,6 +322,23 @@ export default class extends Base {
    * @return {Promise}       []
    */
   async decrement(field, step = 1){
+    if(step===null || step === undefined){
+      step = 1;
+    }
+    step = Number(step);
+    if (typeof field !== 'string' || !field.trim()) {
+      throw new Error('Field name must be a non-empty string');
+    }
+    const forbiddenFields = ['_id'];
+    if (forbiddenFields.includes(field)) {
+      throw new Error('Modifying this field is not allowed.');
+    }
+    if (isNaN(step)) {
+      throw new Error('Invalid step value passed. Must be a number.');
+    }
+    if (!Number.isFinite(step)){
+      throw new Error('Step must be a finite number.');
+    } 
     let options = await this.parseOptions();
     return this.db().update({
       $inc: {
