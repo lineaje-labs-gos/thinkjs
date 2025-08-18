@@ -52,7 +52,7 @@
     "ejs": "2.5.7",
     "multiparty": "4.2.2",
     "mime": "1.6.0",
-    "mysql": "2.11.1",
+    "mysql": "2.18.1",
     "thinkit": "4.10.0",
     "babel-runtime": "6.6.1",
     "bluebird": "3.3.5",
