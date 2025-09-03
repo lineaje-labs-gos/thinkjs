@@ -624,5 +624,175 @@ describe('model/mongo.js', function(){
     })
   })
 
+  
+  it('decrement should work for allowed fields', function(done){
+    const instance = new Mongo('user', think.config('db'));
+    instance.tablePrefix = 'think_';
+    instance._createIndexes = function(){};
 
+    instance.db = function(){
+      return {
+        update: function(data, options){
+          assert.deepEqual(data, { '$inc': { views: -1 } });
+          return Promise.resolve({ result: { n: 1 } });
+        }
+      };
+    };
+    instance.decrement('views').then(() => done()).catch(done);
+  });
+
+  it('increment should work for allowed fields', function(done){
+    const instance = new Mongo('user', think.config('db'));
+    instance.tablePrefix = 'think_';
+    instance._createIndexes = function(){};
+
+    instance.db = function(){
+      return {
+        update: function(data, options){
+          assert.deepEqual(data, { '$inc': { name: 1 } });
+          return Promise.resolve({ result: { n: 1 } });
+        }
+      };
+    };
+
+    instance.increment('name').then(() => done()).catch(done);
+  });
+
+  const valueAndMessage = [{
+    value: 'Nan',
+    message:'Invalid step value passed. Must be a number.'
+  },{
+    value: 'ten',
+    message:'Invalid step value passed. Must be a number.'
+  }, {
+    value: Infinity,
+    message:'Step must be a finite number.'
+  }]
+
+  valueAndMessage.forEach(function(value){
+    it(`increment should throw error when step is ${value.value}`, function(done){
+      const instance = new Mongo('user', think.config('db'));
+      instance.tablePrefix = 'think_';
+      instance._createIndexes = function(){};
+      instance.db = function(){
+        return {
+          update: function(data, options){
+            done(new Error('update should not be called for invalid step'));
+            return Promise.resolve({
+              result: { n: 10 }
+            });
+          }
+        };
+      };
+      instance.increment('views', value.value).then(function(){
+        console.log(value);
+        done(new Error('Expected method to throw.'));
+      }).catch(function(err){
+        assert.equal(err.message, value.message);
+        done();
+      });
+    });
+  });
+  valueAndMessage.forEach(function(value){
+    it(`decrement should throw error when step is ${value.value}`, function(done){
+      const instance = new Mongo('user', think.config('db'));
+      instance.tablePrefix = 'think_';
+      instance._createIndexes = function(){};
+      instance.db = function(){
+        return {
+          update: function(data, options){
+            done(new Error('update should not be called for invalid step'));
+            return Promise.resolve({
+              result: { n: 10 }
+            });
+          }
+        };
+      };
+      instance.decrement('views', value.value).then(function(){
+        console.log(value);
+        done(new Error('Expected method to throw.'));
+      }).catch(function(err){
+        assert.equal(err.message, value.message);
+        done();
+      });
+    });
+  });
+  it(`decrement should use 1 as step when passed undefined`, function(done){
+    const instance = new Mongo('user', think.config('db'));
+    instance.tablePrefix = 'think_';
+    instance._createIndexes = function(){}
+    instance.db = function(){
+      return {
+        update: function(data, options){
+          assert.deepEqual(data, { '$inc': { name: -1 } })
+          return Promise.resolve({
+            result: {n: 10}
+          })
+        }
+      }
+    }
+    instance.decrement('name', undefined).then(function(data){
+      done();
+    })
+  });
+  it(`increment should use 1 as step when passed null`, function(done){
+    const instance = new Mongo('user', think.config('db'));
+    instance.tablePrefix = 'think_';
+    instance._createIndexes = function(){}
+    instance.db = function(){
+      return {
+        update: function(data, options){
+          assert.deepEqual(data, { '$inc': { name: 1 } })
+          return Promise.resolve({
+            result: {n: 10}
+          })
+        }
+      }
+    }
+    instance.increment('name', null).then(function(data){
+      done();
+    })
+  });
+  it('increment should throw error when field is forbidden', function(done){
+    const instance = new Mongo('user', think.config('db'));
+    instance.tablePrefix = 'think_';
+    instance._createIndexes = function(){};
+    instance.db = function(){
+      return {
+        update: function(data, options){
+          done(new Error('update should not be called for invalid field'));
+          return Promise.resolve({
+            result: { n: 10 }
+          });
+        }
+      };
+    };
+    instance.increment('_id', 1).then(function(){
+      done(new Error('Expected method to throw.'));
+    }).catch(function(err){
+      assert.equal(err.message, 'Modifying this field is not allowed.');
+      done();
+    });
+  });
+  it('decrement should throw error when field is forbidden', function(done){
+    const instance = new Mongo('user', think.config('db'));
+    instance.tablePrefix = 'think_';
+    instance._createIndexes = function(){};
+    instance.db = function(){
+      return {
+        update: function(data, options){
+          done(new Error('update should not be called for invalid field'));
+          return Promise.resolve({
+            result: { n: 10 }
+          });
+        }
+      };
+    };
+    instance.decrement('_id', 1).then(function(){
+      done(new Error('Expected method to throw.'));
+    }).catch(function(err){
+      assert.equal(err.message, 'Modifying this field is not allowed.');
+      done();
+    });
+  });
 });

@@ -408,7 +408,7 @@ describe('model/base.js', function(){
       done();
     })
   })
-
+  
   it('parseOptions', function(done){
 	var config = think.extend({}, think.config('db'), {prefix: 'think_'});
     instance.parseOptions().then(function(options){
@@ -1349,6 +1349,50 @@ describe('model/base.js', function(){
       done();
     })
   })
+  const valueAndMessage = [{
+    value: 'Nan',
+    message:'Invalid step value passed. Must be a number.'
+  },{
+    value: 'ten',
+    message:'Invalid step value passed. Must be a number.'
+  }, {
+    value: Infinity,
+    message:'Step must be a finite number.'
+  }]
+  valueAndMessage.forEach(function(item) {
+    it(`decrement should throw when step is ${item.value}`, async function() {
+      try {
+        await instance.where({1: 1}).decrement('title', item.value);
+        throw new Error('Expected method to throw.');
+      } catch (err) {
+        assert(err instanceof Error);
+        assert.strictEqual(err.message, item.message);
+      }
+    });
+  })
+  valueAndMessage.forEach(function(item) {
+    it(`increment should throw when step is ${item.value}`, async function() {
+      try {
+        await instance.where({1: 1}).increment('title', item.value);
+        throw new Error('Expected method to throw.');
+      } catch (err) {
+        assert(err instanceof Error);
+        assert.strictEqual(err.message, item.message);
+      }
+    });
+  });
+  it(`increment should use step as 1 when undefined or null is passed`, async function() {
+    instance.where({1: 1}).increment('title', undefined).then(function(data){
+      const sql = instance.getLastSql();
+      assert.equal(sql, "UPDATE `think_user` SET `title`=`title`+1 WHERE ( 1 = 1 )");
+    });
+  });
+  it(`decrement should use step as 1 when undefined or null is passed`, async function() {
+    instance.where({1: 1}).decrement('title', null).then(function(data){
+      const sql = instance.getLastSql();
+      assert.equal(sql, "UPDATE `think_user` SET `title`=`title`-1 WHERE ( 1 = 1 )");
+    });
+  });
   it('after', function(){
     muk.restore();
   })
